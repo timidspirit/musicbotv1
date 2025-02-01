@@ -1,14 +1,25 @@
-# Use a Python base image
-FROM python:3.11.4-slim
+# Use Python base image
+FROM python:3.10-slim
 
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Copy the Python script into the container
-COPY import.py /app/
+# Copy bot script and requirements file
+COPY bot.py .
+COPY requirements.txt .
 
-# Install the required dependencies
-RUN pip install discord youtube_dl
+# Install dependencies
+RUN apt-get update && apt-get install -y ffmpeg && \
+    pip install -r requirements.txt
 
-# Run the Python script
-CMD ["python", "import.py"]
+# Create cache directory
+RUN mkdir /app/cache
+
+# Set environment variables (default values for variables like PREFIX, IDLE_TIMEOUT, etc.)
+ENV DISCORD_TOKEN="your_discord_bot_token" 
+ENV CACHE_DIR="/app/cache"
+ENV IDLE_TIMEOUT=10
+ENV PREFIX="!"
+
+# Run the bot
+CMD ["python", "bot.py"]
